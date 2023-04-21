@@ -46,7 +46,7 @@ def calc_ndigits(n=DEFAULT_DIGITS):
 test ="""
 import itertools
 
-DEFAULT_DIGITS = 2000
+DEFAULT_DIGITS = 100
 icount = itertools.count
 islice = itertools.islice
 
@@ -82,7 +82,7 @@ def gen_pi_digits():
 
 def calc_ndigits(n=DEFAULT_DIGITS):
     return list(islice(gen_pi_digits(), n))
-calc_ndigits(digits)
+calc_ndigits()
 """
 
 def bench_threading(n, digits):
@@ -95,11 +95,11 @@ def bench_threading(n, digits):
     for thread in threads:
         thread.join()
 
-def bench_subinterpreters(n, digits, nosite=False):
+def bench_subinterpreters(n, digits):
     # Code to launch specific model
     def _spawn_sub(digits):
-        sid = subinterpreters.create(nosite=nosite)
-        subinterpreters.run_string(sid, test, shared={"digits": digits})
+        sid = subinterpreters.create()
+        subinterpreters.run_string(sid, test)
 
     threads = []
     for _ in range(n):
@@ -122,9 +122,8 @@ def bench_multiprocessing(n, digits):
 if __name__ == "__main__":
     runner = pyperf.Runner()
     runner.metadata['description'] = "Benchmark parallel execution scaling models"
-    for n in [1, 5, 10, 50]:
-        for digits in [1, 10, 100, 1000, 2000]:
-            runner.bench_func(f'threading__{n}_{digits}', bench_threading, n, digits)
+    for n in [5, 10]:
+        for digits in [100]:
+            runner.bench_func(f'threading_{n}_{digits}', bench_threading, n, digits)
             runner.bench_func(f'subinterpreters_{n}_{digits}', bench_subinterpreters, n, digits)
-            runner.bench_func(f'subinterpreters_nosite_{n}_{digits}', bench_subinterpreters, n, digits, True)
             runner.bench_func(f'multiprocessing_{n}_{digits}', bench_multiprocessing, n, digits)

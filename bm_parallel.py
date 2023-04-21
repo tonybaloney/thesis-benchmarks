@@ -6,7 +6,7 @@ import _xxsubinterpreters as subinterpreters
 
 import itertools
 
-DEFAULT_DIGITS = 2000
+DEFAULT_DIGITS = 200
 icount = itertools.count
 islice = itertools.islice
 
@@ -46,7 +46,7 @@ def calc_ndigits(n=DEFAULT_DIGITS):
 test ="""
 import itertools
 
-DEFAULT_DIGITS = 2000
+DEFAULT_DIGITS = 200
 icount = itertools.count
 islice = itertools.islice
 
@@ -95,10 +95,10 @@ def bench_threading(n):
     for thread in threads:
         thread.join()
 
-def bench_subinterpreters(n):
+def bench_subinterpreters(n, site=True):
     # Code to launch specific model
     def _spawn_sub():
-        sid = subinterpreters.create()
+        sid = subinterpreters.create(site=site)
         subinterpreters.run_string(sid, test)
 
     threads = []
@@ -125,4 +125,5 @@ if __name__ == "__main__":
     n = 10
     runner.bench_func('threading', bench_threading, n)
     runner.bench_func('subinterpreters', bench_subinterpreters, n)
+    runner.bench_func('subinterpreters_nosite', bench_subinterpreters, n, False)
     runner.bench_func('multiprocessing', bench_multiprocessing, n)
