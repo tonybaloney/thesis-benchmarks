@@ -46,7 +46,7 @@ def calc_ndigits(n=DEFAULT_DIGITS):
 test ="""
 import itertools
 
-DEFAULT_DIGITS = 100
+DEFAULT_DIGITS = {digits}
 icount = itertools.count
 islice = itertools.islice
 
@@ -99,7 +99,7 @@ def bench_subinterpreters(n, digits):
     # Code to launch specific model
     def _spawn_sub(digits):
         sid = subinterpreters.create()
-        subinterpreters.run_string(sid, test)
+        subinterpreters.run_string(sid, test.format(digits=digits))
 
     threads = []
     for _ in range(n):
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     runner = pyperf.Runner()
     runner.metadata['description'] = "Benchmark parallel execution scaling models"
     for n in [5, 10]:
-        for digits in [100]:
+        for digits in [10, 50, 100]:
             runner.bench_func(f'threading_{n}_{digits}', bench_threading, n, digits)
             runner.bench_func(f'subinterpreters_{n}_{digits}', bench_subinterpreters, n, digits)
             runner.bench_func(f'multiprocessing_{n}_{digits}', bench_multiprocessing, n, digits)
